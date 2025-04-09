@@ -60,12 +60,14 @@ This example uses default parameters that were created for use in CBM-CFS3 as de
 This module can run independently by running the global script below. Run independently, it provides transparent access to default parameters for all managed forests of Canada for [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git) simulations. 
 
 ```{r module_deafults_usage, eval=FALSE}
+# project path and package install
 projectPath <- "~/CBM_defaults"
 repos <- c("predictiveecology.r-universe.dev", getOption("repos"))
 if ((packageVersion("SpaDES.project") < "0.1.1" || packageVersion("Require") < "1.0.1.9002") |>
     tryCatch(error = function(x) TRUE))
   install.packages(c("SpaDES.project", "Require"), repos = repos)
 
+# setup
 out <- SpaDES.project::setupProject(
   paths = list(projectPath = projectPath),
   
@@ -77,6 +79,7 @@ out <- SpaDES.project::setupProject(
   require = c("SpaDES.core"),
 )
 
+# run
 outDefaults <- SpaDES.core::simInitAndSpades2(out)
 ```
 
