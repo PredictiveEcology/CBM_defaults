@@ -47,7 +47,7 @@ defineModule(sim, list(
       desc = "URL for spuLocator")
   ),
   outputObjects = bindrows(
-    createsOutput(objectName = "species_tr",        objectClass = "data.table",
+    createsOutput(objectName = "CBMspecies",        objectClass = "data.table",
                   desc = "Species table with names and associated species id"),
     createsOutput(objectName = "disturbanceMatrix", objectClass = "data.table",
                   desc = "Disturbance table with disturbance names associated with disturbance_matrix_id, disturbance_type_id"),
@@ -112,13 +112,6 @@ Init <- function(sim) {
   # [47] "vol_to_bio_factor"                    "vol_to_bio_forest_type"
   # [49] "vol_to_bio_genus"                     "vol_to_bio_species"
 
-
-#extract species tables
-  # this table has species_id, locale_id, name
-species_tr <- as.data.table(dbGetQuery(archiveIndex, "SELECT * FROM species_tr"))
-#keep english only
-sim$species_tr <- species_tr[locale_id <= 1,]
-
   # This table, matrices6, has all the names associated with
   # disturbance_type_id. disturbance_type_id, along with spatial_unit_id and a
   # sw_hw flag is how libcbm connects (internally) to the proportions. In the
@@ -157,9 +150,15 @@ sim$species_tr <- species_tr[locale_id <= 1,]
   pooldef <- prepInputs(url = pooldefURL,
                         targetFile = "pools.json",
                         destinationPath = inputPath(sim),
-                        fun = fread)
+                        fun = suppressWarnings(data.table::fread(targetFile)))
   sim$pooldef <- as.character(pooldef$V1)
 
+  #extract species.csv
+  CBMspeciesURL <- "https://raw.githubusercontent.com/cat-cfs/libcbm_py/refs/heads/main/libcbm/resources/cbm_exn/species.csv"
+  sim$CBMspecies <- prepInputs(url = CBMspeciesURL,
+                           targetFile = "species.csv",
+                           destinationPath = inputPath(sim),
+                           fun = fread)
   # ! ----- STOP EDITING ----- ! #
 
   return(invisible(sim))
