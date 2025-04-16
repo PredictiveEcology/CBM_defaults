@@ -16,55 +16,59 @@ This documentation is work in progress. Potential discrepancies and omissions ma
 
 ## Overview
 
-[CBM_defaults](https://github.com/PredictiveEcology/CBM_defaults.git) reads in default parameters for the managed forest of Canada. In *SpaDES-speak*, it has one event (`init`). On its own, this module provides R-based access to all defaults **CBM** parameters for the managed forests of Canada. As part of [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git), it provides simulations with default parameter values for the managed forests of Canada, akin to the Archive Index in the CBM-CFS3 documentation. Most parameters are read in from an SQLite database (link below), with some defaults, modified from CBM-CFS3 to accommodate a more flexible representation of vegetation dynamics enable by the `libcbm` Python functions used, available [here](https://github.com/cat-cfs/libcbm_py/tree/main/libcbm/resources/cbm_exn). Defaults for the managed forests of Canada include disturbance data such as different disturbance types and their IDs, spinup parameters, pool names, fire return intervals for each ecozone (DEFINE) and more. The outputs of this module are used by [CBM_dataPrep_SK](https://github.com/PredictiveEcology/CBM_dataPrep_SK.git) and [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) in [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git) simulations.
+[CBM_defaults](https://github.com/PredictiveEcology/CBM_defaults.git) reads in default parameters for the managed forest of Canada. In *SpaDES-speak*, it has one event (`init`). On its own, this module provides R-based access to all defaults **CBM** parameters for the managed forests of Canada (run [Usage] section below to run this module independently). As part of [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git), it provides simulations with default parameter values for the managed forests of Canada, akin to the Archive Index in the CBM-CFS3 documentation. Most parameters are read in from an SQLite database (link below), with some defaults, modified from CBM-CFS3 to accommodate a more flexible representation of vegetation dynamics enable by the `libcbm` Python functions used, available [here](https://github.com/cat-cfs/libcbm_py/tree/main/libcbm/resources/cbm_exn). Defaults for the managed forests of Canada include disturbance data such as different disturbance types and their IDs, spinup parameters, pool names, fire return intervals for each [ecozone](https://predictiveecology.github.io/spadesCBM/lexicon.html) and more. The outputs of this module are used by [CBM_dataPrep_SK](https://github.com/PredictiveEcology/CBM_dataPrep_SK.git) and [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) in [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git) simulations.
 
-## List of input objects
+## Background
+
+This example uses default parameters that were created for use in CBM-CFS3 as described in @kurz2009. Few of these parameters have source references. The ones who do are outline in the [Operational-scale Carbon Budget Model of the Canadian Forest Sector (CBM-CFS3) version 1.2: user’s guide](https://osdp-psdo.canada.ca/dp/en/search/metadata/NRCAN-CFS-1-7570539d-a457-43ef-9215-584ad612f409). [CBM_defaults](https://github.com/PredictiveEcology/CBM_defaults.git) brings the parameters to an R-environment, for easy user-access and modifications.
+
+## Inputs
 
 | Name | Class | Description | Source |
 |------------------|------------------|-------------------|------------------|
-| Archive Index | SQL Database | SQLite database file for CFS_CBM3 default tables | <https://github.com/cat-cfs/libcbm_py/tree/main/libcbm/resources/cbm_defaults_db> |
-| Disturbance Matrix Association | Data table | Default disturbance IDs | <https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_association.csv> |
-| Disturbance Matrix Value | Data table | Default disturbance data | <https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_value.csv> |
-| ecoLocator | Shapefile | Canada's ecozone as polygon features | <http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip> |
-| spuLocator | Shapefile | Canada's spatial units as polygon features | <https://drive.google.com/file/d/1D3O0Uj-s_QEgMW7_X-NhVsEZdJ29FBed> |
+| Archive Index | SQL Database | SQLite database file for CFS_CBM3 default tables | [GitHub](https://github.com/cat-cfs/libcbm_py/tree/main/libcbm/resources/cbm_defaults_db) |
+| Disturbance Matrix Association | Data table | Default disturbance IDs | [GitHub](https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_association.csv) |
+| Disturbance Matrix Value | Data table | Default disturbance data | [GitHub](https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_value.csv) |
+| species.csv | Data table | Default species information | [GitHub](https://github.com/cat-cfs/libcbm_py/blob/main/libcbm/resources/cbm_exn/species.csv) |
+| ecoLocator | Shapefile | Canada's ecozone as polygon features | [Canadian Soil information Service](http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip) |
+| spuLocator | Shapefile | Canada's spatial units as polygon features | [Google Drive](https://drive.google.com/file/d/1D3O0Uj-s_QEgMW7_X-NhVsEZdJ29FBed) |
 
 
 ## Module functioning
 
-- The SQLite database, and a selection of the `cbm_exn` resource files are downloaded and stored into the user's Inputs folder from GitHub using the `reproducible::prepInputs` function, a useful tool in the `SpaDES` toolkit.
-- Parameters necessary for [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git) simulations are extracted from the downloaded files. Each of these are saved as objects in the `simList` (see list of output objects above).
-- The `species_tr` object is created to match a species name to the user-provided growth curve.
+- The SQLite database, and a selection of the `cbm_exn` resource files are downloaded and stored into the user's Inputs folder from GitHub using the `reproducible::prepInputs` function, a useful tool in the [SpaDES](https://SpaDES.PredictiveEcology.org) toolkit.
+- Parameters necessary for [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git) simulations are extracted from the downloaded files. Each of these are saved as objects in the [simList](https://predictiveecology.github.io/spadesCBM/lexicon.html) (see list of output objects above).
 - The `disturbanceMatrix` and `cTransfers` objects help identify which carbon transfers matches the provided disturbances as it matches the transfer matrix IDs and the proportions transferred to disturbance names.
-- Parameters for the `spinup` event in the [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) modules are assembled in the spinupSQL object.
-- `pooldef` gives the names of each carbon pool that exists in CBM (LINK TO THE POOLS IN index.Rmd).
-- Objects that narrow the parameter selection to the study area are `spuLocator` and `ecolocator` 
+- Parameters necessary for the `spinup` event in the [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) modules are assembled in the `spinupSQL` object.
+- `pooldef` gives the names of each [carbon pool](https://predictiveecology.github.io/spadesCBM/index.html#pools) that exists in CBM.
+- [`species.csv`](https://github.com/cat-cfs/libcbm_py/blob/main/libcbm/resources/cbm_exn/species.csv) is read in as the `CBMspecies` object. 
+- Objects that narrow the parameter selection to the study area are `spuLocator` and `ecolocator`. 
 
-## List of output objects
+## Outputs
 
 | Name              | Class      | Description                          |
 |-------------------|------------|--------------------------------------|
-| species_tr        | Data table | Default species data             |
 | disturbanceMatrix | Data table | Default disturbance data             |
 | cTransfers        | Data table | Default disturbance data             |
 | spinupSQL         | Data table | Parameters for [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) spinup event |
 | pooldef           | Character  | Vector of pools                      |
+| CBMspecies        | Data table | Default species data             |
 | ecoLocator | Shapefile | Canada's ecozone as polygon features with ecozone IDs |
 | spuLocator | Shapefile | Canada's spatial units as polygon features with spatial unit IDs |
 
-## Background
-
-This example uses default parameters that were created for use in CBM-CFS3. Few of these parameters have source references. The ones who do are outline in the [Operational-scale Carbon Budget Model of the Canadian Forest Sector (CBM-CFS3) version 1.2: user’s guide](https://osdp-psdo.canada.ca/dp/en/search/metadata/NRCAN-CFS-1-7570539d-a457-43ef-9215-584ad612f409). [CBM_defaults](https://github.com/PredictiveEcology/CBM_defaults.git) brings the parameters to an R-environment, for easy user-access and modifications.
 
 ## Usage
 This module can run independently by running the global script below. Run independently, it provides transparent access to default parameters for all managed forests of Canada for [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git) simulations. 
 
 ```{r module_deafults_usage, eval=FALSE}
+# project path and package install
 projectPath <- "~/CBM_defaults"
 repos <- c("predictiveecology.r-universe.dev", getOption("repos"))
 if ((packageVersion("SpaDES.project") < "0.1.1" || packageVersion("Require") < "1.0.1.9002") |>
     tryCatch(error = function(x) TRUE))
   install.packages(c("SpaDES.project", "Require"), repos = repos)
 
+# setup
 out <- SpaDES.project::setupProject(
   paths = list(projectPath = projectPath),
   
@@ -76,5 +80,12 @@ out <- SpaDES.project::setupProject(
   require = c("SpaDES.core"),
 )
 
+# run
 outDefaults <- SpaDES.core::simInitAndSpades2(out)
 ```
+
+## Links to other modules
+
+- [CBM_dataPrep_SK](https://github.com/PredictiveEcology/CBM_dataPrep_SK.git)
+- [CBM_vol2biomass](https://github.com/PredictiveEcology/CBM_vol2biomass)
+- [CBM_core](https://github.com/PredictiveEcology/CBM_core)
