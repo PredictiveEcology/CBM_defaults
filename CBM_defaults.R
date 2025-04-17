@@ -123,7 +123,7 @@ Init <- function(sim) {
   # matrices6 has French, Spanish and Russian disturbance translations, here we
   # only keep one copy in English.
   matrices6 <- matrices6[locale_id <= 1,]
-  # only keep the colums we need, disturbance_type_id and its associated name.
+  # only keep the columns we need, disturbance_type_id and its associated name.
   matrices6 <- matrices6[,.(disturbance_type_id, name, description)]
   # $disturbanceMatrix links together spatial_unit_id disturbance_type_id
   # disturbance_matrix_id, the disturbance names and descriptions.
@@ -137,9 +137,8 @@ Init <- function(sim) {
   sim$cTransfers <- cTransfers
 
   # Get location and mean_annual_temperature for each spatial_unit, along with
-  # other spinup parameters. These are needed to create sim$level3DT in
-  # CBM_dataPrep_XX, which are in turn used in the CBM_core to create the
-  # spinup_parameters in CBM_core.
+  # other spinup parameters. These are used in the CBM_core to create the
+  # spinup_parameters.
   spatialUnitIds <- as.data.table(dbGetQuery(archiveIndex, "SELECT * FROM spatial_unit"))
   spinupParameter <-  as.data.table(dbGetQuery(archiveIndex, "SELECT * FROM spinup_parameter"))
   #create $spinupSQL for use in other modules
