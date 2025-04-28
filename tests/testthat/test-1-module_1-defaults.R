@@ -35,10 +35,10 @@ test_that("Module runs with defaults", {
   expect_s4_class(simTest, "simList")
 
 
-  ## Check output 'species_tr' ----
+  ## Check output 'CBMspecies' ----
 
-  expect_true(!is.null(simTest$species_tr))
-  expect_true(inherits(simTest$species_tr, "data.table"))
+  expect_true(!is.null(simTest$CBMspecies))
+  expect_true(inherits(simTest$CBMspecies, "data.table"))
 
 
   ## Check output 'disturbanceMatrix' ----
