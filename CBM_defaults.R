@@ -181,14 +181,12 @@ Init <- function(sim) {
 
       sim$dbPath <- file.path(inputPath(sim), "cbm_defaults_v1.2.8340.362.db")
 
-      prepInputs(
+      if (!file.exists(sim$dbPath)) prepInputs(
         destinationPath = inputPath(sim),
         url         = extractURL("dbPath"),
         targetFile  = basename(sim$dbPath),
-        dlFun       = if (!file.exists(sim$dbPath)){
-          download.file(extractURL("dbPath"), sim$dbPath, mode = "wb", quiet = TRUE)
-        },
-        fun = NA
+        dlFun       = download.file(extractURL("dbPath"), sim$dbPath, mode = "wb", quiet = TRUE),
+        fun         = NA
       )
     }
   }
