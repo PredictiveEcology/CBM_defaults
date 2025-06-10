@@ -13,7 +13,7 @@ defineModule(sim, list(
   timeunit = "year",
   citation = list("citation.bib"),
   documentation = list("README.txt", "CBM_defaults.Rmd"),
-  reqdPkgs = list("RSQLite", "data.table", "sf"),
+  reqdPkgs = list("RSQLite", "data.table"),
   parameters = bindrows(
     defineParameter(".useCache", "logical", FALSE, NA, NA, NA)
   ),
@@ -32,21 +32,7 @@ defineModule(sim, list(
                  desc = "Carbon transfer values table with associated disturbance IDs",
                  sourceURL = "https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_value.csv"),
     expectsInput( objectName = "dMatrixValueURL", objectClass = "character",
-                  desc = "URL for dMatrixValue"),
-    expectsInput(
-      objectName = "ecoLocator", objectClass = "sf",
-      sourceURL = "http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip",
-      desc = "Canada's ecozones as polygon features"),
-    expectsInput(
-      objectName = "ecoLocatorURL", objectClass = "character",
-      desc = "URL for ecoLocator"),
-    expectsInput(
-      objectName = "spuLocator", objectClass = "sf|SpatRaster",
-      sourceURL = "https://drive.google.com/file/d/1D3O0Uj-s_QEgMW7_X-NhVsEZdJ29FBed",
-      desc = "Canada's spatial units as polygon features"),
-    expectsInput(
-      objectName = "spuLocatorURL", objectClass = "character",
-      desc = "URL for spuLocator")
+                  desc = "URL for dMatrixValue")
   ),
   outputObjects = bindrows(
     createsOutput(objectName = "CBMspecies",        objectClass = "data.table",
@@ -58,13 +44,7 @@ defineModule(sim, list(
     createsOutput(objectName = "spinupSQL",         objectClass = "data.table",
                   desc = "Table containing many necesary spinup parameters used in CBM_core"),
     createsOutput(objectName = "pooldef",           objectClass = "character",
-                  desc = "Vector of names for each of the carbon pools"),
-    createsOutput(
-      objectName = "ecoLocator", objectClass = "sf",
-      desc = "Canada's ecozones as polygon features with field 'ecoID' containing ecozone IDs"),
-    createsOutput(
-      objectName = "spuLocator", objectClass = "sf",
-      desc = "Canada's spatial units as polygon features with field 'spuID' containing spatial unit IDs")
+                  desc = "Vector of names for each of the carbon pools")
   )
 ))
 
@@ -213,73 +193,6 @@ Init <- function(sim) {
                                          destinationPath = inputPath(sim),
                                          fun = fread
     )
-  }
-
-
-  # Canada ecozones
-  if (!suppliedElsewhere("ecoLocator", sim)){
-
-    if (suppliedElsewhere("ecoLocatorURL", sim) &
-        !identical(sim$ecoLocatorURL, extractURL("ecoLocator"))){
-
-      sim$ecoLocator <- prepInputs(
-        destinationPath = inputPath(sim),
-        url = sim$ecoLocatorURL
-      )
-
-    }else{
-
-      ## 2024-12-04 NOTE:
-      ## Multiple users had issues downloading and extracting this file via prepInputs.
-      ## Downloading the ZIP directly and saving it in the inputs directory works OK.
-      sim$ecoLocator <- tryCatch(
-
-        prepInputs(
-          destinationPath = inputPath(sim),
-          url         = extractURL("ecoLocator"),
-          filename1   = "ecozone_shp.zip",
-          targetFile  = "ecozones.shp",
-          alsoExtract = "similar",
-          fun         = sf::st_read(targetFile, agr = "constant", quiet = TRUE)
-        ),
-
-        error = function(e) stop(
-          "Canada ecozones Shapefile failed be downloaded and extracted:\n", e$message, "\n\n",
-          "If this error persists, download the ZIP file directly and save it to the inputs directory.",
-          "\nDownload URL: ", extractURL("ecoLocator"),
-          "\nInputs directory: ", normalizePath(inputPath(sim), winslash = "/"),
-          call. = FALSE))
-
-      # Make ecoID field
-      sim$ecoLocator <- cbind(ecoID = sim$ecoLocator$ECOZONE, sim$ecoLocator)
-    }
-  }
-
-  # Canada spatial units
-  if (!suppliedElsewhere("spuLocator", sim)){
-
-    if (suppliedElsewhere("spuLocatorURL", sim) &
-        !identical(sim$spuLocatorURL, extractURL("spuLocator"))){
-
-      sim$spuLocator <- prepInputs(
-        destinationPath = inputPath(sim),
-        url = sim$spuLocatorURL
-      )
-
-    }else{
-
-      sim$spuLocator <- prepInputs(
-        destinationPath = inputPath(sim),
-        url         = extractURL("spuLocator"),
-        filename1   = "spUnit_Locator.zip",
-        targetFile  = "spUnit_Locator.shp",
-        alsoExtract = "similar",
-        fun         = sf::st_read(targetFile, agr = "constant", quiet = TRUE)
-      )
-
-      # Make spuID field
-      sim$spuLocator <- cbind(spuID = sim$spuLocator$spu_id, sim$spuLocator)
-    }
   }
 
   # Return sim

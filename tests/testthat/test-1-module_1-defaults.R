@@ -65,18 +65,6 @@ test_that("Module runs with defaults", {
   expect_true(inherits(simTest$pooldef, "character"))
 
 
-  ## Check output 'ecoLocator' ----
-
-  expect_true(!is.null(simTest$ecoLocator))
-  expect_true(inherits(simTest$ecoLocator, "sf"))
-
-
-  ## Check output 'spuLocator' ----
-
-  expect_true(!is.null(simTest$spuLocator))
-  expect_true(inherits(simTest$spuLocator, "sf"))
-
-
 })
 
 
