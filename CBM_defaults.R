@@ -141,6 +141,37 @@ Init <- function(sim) {
                            targetFile = "species.csv",
                            destinationPath = inputPath(sim),
                            fun = fread)
+
+  #build cbmAdmin
+  spatialUnit <- as.data.table(dbGetQuery(archiveIndex, "SELECT * FROM spatial_unit"))
+  spatialUnit <- spatialUnit[, .(id , admin_boundary_id , eco_boundary_id)]
+  adminBoundary <- as.data.table(dbGetQuery(archiveIndex, "SELECT * FROM admin_boundary_tr"))
+  adminBoundary <- adminBoundary[locale_id <= 1,]
+  adminBoundary[, locale_id := NULL]
+  cbmAdmin <- spatialUnit[adminBoundary, on = .(admin_boundary_id = admin_boundary_id)]
+  colNames <- c("SpatialUnitID", "AdminBoundaryID", "EcoBoundaryID", "stump_parameter_id", "adminName")
+  setnames(cbmAdmin,names(cbmAdmin),
+           colNames)
+    cbmAdmin$abreviation <- c(
+    "Newfoundland"              = "NL",
+    "Labrador"                  = "NL",
+    "Newfoundland and Labrador" = "NL",
+    "Prince Edward Island"      = "PE",
+    "Nova Scotia"               = "NS",
+    "New Brunswick"             = "NB",
+    "Quebec"                    = "QC",
+    "Ontario"                   = "ON",
+    "Manitoba"                  = "MB",
+    "Alberta"                   = "AB",
+    "Saskatchewan"              = "SK",
+    "British Columbia"          = "BC",
+    "Yukon"                     = "YT",
+    "Yukon Territory"           = "YT",
+    "Northwest Territories"     = "NT",
+    "Nunavut"                   = "NU")[cbmAdmin$adminName]
+    sim$cbmAdmin <- cbmAdmin
+
+
   # ! ----- STOP EDITING ----- ! #
 
   return(invisible(sim))
