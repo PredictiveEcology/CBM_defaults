@@ -16,10 +16,10 @@ test_that("Module runs with defaults", {
     modules = "CBM_defaults",
     paths   = list(
       projectPath = projectPath,
-      modulePath  = spadesTestPaths$temp$modules,
-      inputPath   = spadesTestPaths$temp$inputs,
-      packagePath = spadesTestPaths$temp$packages,
-      cachePath   = file.path(projectPath, "cache"),
+      modulePath  = spadesTestPaths$modulePath,
+      packagePath = spadesTestPaths$packagePath,
+      inputPath   = spadesTestPaths$inputPath,
+      cachePath   = spadesTestPaths$cachePath,
       outputPath  = file.path(projectPath, "outputs")
     )
   )
@@ -35,10 +35,10 @@ test_that("Module runs with defaults", {
   expect_s4_class(simTest, "simList")
 
 
-  ## Check output 'species_tr' ----
+  ## Check output 'CBMspecies' ----
 
-  expect_true(!is.null(simTest$species_tr))
-  expect_true(inherits(simTest$species_tr, "data.table"))
+  expect_true(!is.null(simTest$CBMspecies))
+  expect_true(inherits(simTest$CBMspecies, "data.table"))
 
 
   ## Check output 'disturbanceMatrix' ----
@@ -47,40 +47,22 @@ test_that("Module runs with defaults", {
   expect_true(inherits(simTest$disturbanceMatrix, "data.table"))
 
 
+  ## Check output 'cTransfers' ----
+
+  expect_true(!is.null(simTest$cTransfers))
+  expect_true(inherits(simTest$cTransfers, "data.table"))
+
+
   ## Check output 'spinupSQL' ----
 
   expect_true(!is.null(simTest$spinupSQL))
   expect_true(inherits(simTest$spinupSQL, "data.table"))
 
 
-  ## Check output 'forestTypeId' ----
-
-  expect_true(!is.null(simTest$forestTypeId))
-  expect_true(inherits(simTest$forestTypeId, "data.table"))
-
-
   ## Check output 'pooldef' ----
 
   expect_true(!is.null(simTest$pooldef))
   expect_true(inherits(simTest$pooldef, "character"))
-
-
-  ## Check output 'poolCount' ----
-
-  expect_true(!is.null(simTest$poolCount))
-  expect_true(inherits(simTest$poolCount, "numeric") | inherits(simTest$poolCount, "integer"))
-
-
-  ## Check output 'ecoLocator' ----
-
-  expect_true(!is.null(simTest$ecoLocator))
-  expect_true(inherits(simTest$ecoLocator, "sf"))
-
-
-  ## Check output 'spuLocator' ----
-
-  expect_true(!is.null(simTest$spuLocator))
-  expect_true(inherits(simTest$spuLocator, "sf"))
 
 
 })
