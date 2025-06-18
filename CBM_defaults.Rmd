@@ -42,7 +42,7 @@ This example uses default parameters that were created for use in CBM-CFS3 as de
 - Parameters necessary for the `spinup` event in the [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) modules are assembled in the `spinupSQL` object.
 - `pooldef` gives the names of each [carbon pool](https://predictiveecology.github.io/spadesCBM/index.html#pools) that exists in CBM.
 - [`species.csv`](https://github.com/cat-cfs/libcbm_py/blob/main/libcbm/resources/cbm_exn/species.csv) is read in as the `CBMspecies` object. 
-- Objects that narrow the parameter selection to the study area are `spuLocator` and `ecolocator`. 
+- `cbmAdmin` identifies all ecozones and spatial unit IDs combinations possible for each province and territory.
 
 ## Outputs
 
@@ -53,8 +53,7 @@ This example uses default parameters that were created for use in CBM-CFS3 as de
 | spinupSQL         | Data table | Parameters for [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) spinup event |
 | pooldef           | Character  | Vector of pools                      |
 | CBMspecies        | Data table | Default species data             |
-| ecoLocator | Shapefile | Canada's ecozone as polygon features with ecozone IDs |
-| spuLocator | Shapefile | Canada's spatial units as polygon features with spatial unit IDs |
+| cbmAdmin          | Data table | Ecozone and spatial unit information for provincial boundaries |	
 
 
 ## Usage
