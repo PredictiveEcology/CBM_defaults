@@ -44,7 +44,9 @@ defineModule(sim, list(
     createsOutput(objectName = "spinupSQL",         objectClass = "data.table",
                   desc = "Table containing many necesary spinup parameters used in CBM_core"),
     createsOutput(objectName = "pooldef",           objectClass = "character",
-                  desc = "Vector of names for each of the carbon pools")
+                  desc = "Vector of names for each of the carbon pools"),
+    createsOutput(objectName = "cbmAdmin",        objectClass = "data.table",
+                  desc = "Administrative boundaries with their associated ecozones and spatial unit IDs"),
   )
 ))
 
