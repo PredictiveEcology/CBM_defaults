@@ -12,9 +12,14 @@ download.file(
   tempScript, quiet = TRUE)
 source(tempScript)
 
-# Set up testing global options
+# Set up testing directories and global options
 SpaDEStestSetGlobalOptions()
+spadesTestPaths <- SpaDEStestSetUpDirectories()
 
-# Set up testing directories
-spadesTestPaths <- SpaDEStestSetUpDirectories(require = "googledrive")
+# Install required packages
+withr::with_options(c(timeout = 600), Require::Install(
+  c(SpaDES.core::packages(modules = basename(getwd()), paths = "..")[[1]],
+    "SpaDES.project", "googledrive"),
+  repos = unique(c("predictiveecology.r-universe.dev", getOption("repos")))
+))
 
