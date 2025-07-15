@@ -13,7 +13,7 @@ defineModule(sim, list(
   timeunit = "year",
   citation = list("citation.bib"),
   documentation = list("README.txt", "CBM_defaults.Rmd"),
-  reqdPkgs = list("RSQLite", "data.table"),
+  reqdPkgs = list("reproducible", "RSQLite", "data.table"),
   parameters = bindrows(
     defineParameter(".useCache", "logical", FALSE, NA, NA, NA)
   ),
