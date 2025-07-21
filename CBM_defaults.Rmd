@@ -85,6 +85,7 @@ outDefaults <- SpaDES.core::simInitAndSpades2(out)
 
 ## Links to other modules
 
+- [CBM_datPrep](https://github.com/PredictiveEcology/CBM_dataPrep)
 - [CBM_dataPrep_SK](https://github.com/PredictiveEcology/CBM_dataPrep_SK.git)
 - [CBM_vol2biomass_SK](https://github.com/PredictiveEcology/CBM_vol2biomass_SK)
 - [CBM_core](https://github.com/PredictiveEcology/CBM_core)
