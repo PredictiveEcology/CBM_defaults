@@ -116,7 +116,7 @@ Init <- function(sim) {
 
   # here we want to match sim$dMatrixValue with disturbanceMatrix so that sim$CTransfers has disturbance names.
   # CTransfers will have to be subset to the regions' spatial_unit_id.
-  disturbanceNames <- unique(disturbanceMatrix[,.(disturbance_type_id, disturbance_matrix_id, name, description, spatial_unit_id)])
+  disturbanceNames <- unique(disturbanceMatrix[, .(disturbance_type_id, spatial_unit_id, sw_hw, disturbance_matrix_id, name, description)])
   cTransfers <- sim$dMatrixValue[disturbanceNames, on = .(disturbance_matrix_id = disturbance_matrix_id), allow.cartesian=TRUE]
   sim$cTransfers <- cTransfers
 
