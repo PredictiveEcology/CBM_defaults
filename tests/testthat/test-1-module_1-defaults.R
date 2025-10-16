@@ -5,22 +5,19 @@ test_that("Module runs with defaults", {
 
   ## Run simInit and spades ----
 
-  # Set project path
-  projectPath <- file.path(spadesTestPaths$temp$projects, "1-defaults")
-  dir.create(projectPath)
-  withr::local_dir(projectPath)
-
   # Set up project
+  projectName <- "1-defaults"
+
   simInitInput <- SpaDES.project::setupProject(
 
     modules = "CBM_defaults",
     paths   = list(
-      projectPath = projectPath,
+      projectPath = spadesTestPaths$projectPath,
       modulePath  = spadesTestPaths$modulePath,
       packagePath = spadesTestPaths$packagePath,
       inputPath   = spadesTestPaths$inputPath,
       cachePath   = spadesTestPaths$cachePath,
-      outputPath  = file.path(projectPath, "outputs")
+      outputPath  = file.path(spadesTestPaths$temp$outputs, projectName)
     )
   )
 
@@ -35,35 +32,27 @@ test_that("Module runs with defaults", {
   expect_s4_class(simTest, "simList")
 
 
-  ## Check output 'CBMspecies' ----
+  ## Check outputs ----
 
+  # CBMspecies
   expect_true(!is.null(simTest$CBMspecies))
   expect_true(inherits(simTest$CBMspecies, "data.table"))
 
-
-  ## Check output 'disturbanceMatrix' ----
-
+  # disturbanceMatrix
   expect_true(!is.null(simTest$disturbanceMatrix))
   expect_true(inherits(simTest$disturbanceMatrix, "data.table"))
 
-
-  ## Check output 'cTransfers' ----
-
+  # cTransfers
   expect_true(!is.null(simTest$cTransfers))
   expect_true(inherits(simTest$cTransfers, "data.table"))
 
-
-  ## Check output 'spinupSQL' ----
-
+  # spinupSQL
   expect_true(!is.null(simTest$spinupSQL))
   expect_true(inherits(simTest$spinupSQL, "data.table"))
 
-
-  ## Check output 'pooldef' ----
-
+  # pooldef
   expect_true(!is.null(simTest$pooldef))
   expect_true(inherits(simTest$pooldef, "character"))
-
 
 })
 
