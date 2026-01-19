@@ -43,8 +43,6 @@ defineModule(sim, list(
                   desc = "Carbon transfer values table with associated disturbance names and IDs"),
     createsOutput(objectName = "spinupSQL",         objectClass = "data.table",
                   desc = "Table containing many necesary spinup parameters used in CBM_core"),
-    createsOutput(objectName = "pooldef",           objectClass = "character",
-                  desc = "Vector of names for each of the carbon pools"),
     createsOutput(objectName = "cbmAdmin",        objectClass = "data.table",
                   desc = "Administrative boundaries with their associated ecozones and spatial unit IDs"),
   )
@@ -128,14 +126,6 @@ Init <- function(sim) {
   spinupParameter <-  as.data.table(dbGetQuery(archiveIndex, "SELECT * FROM spinup_parameter"))
   #create $spinupSQL for use in other modules
   sim$spinupSQL <- spatialUnitIds[spinupParameter, on = .(spinup_parameter_id = id)]
-
-  #extract for pooldef
-  pooldefURL <- "https://raw.githubusercontent.com/cat-cfs/libcbm_py/refs/heads/main/libcbm/resources/cbm_exn/pools.json"
-  pooldef <- prepInputs(url = pooldefURL,
-                        targetFile = "pools.json",
-                        destinationPath = inputPath(sim),
-                        fun = suppressWarnings(data.table::fread(targetFile)))
-  sim$pooldef <- as.character(pooldef$V1)
 
   #extract species.csv
   CBMspeciesURL <- "https://raw.githubusercontent.com/cat-cfs/libcbm_py/refs/heads/main/libcbm/resources/cbm_exn/species.csv"

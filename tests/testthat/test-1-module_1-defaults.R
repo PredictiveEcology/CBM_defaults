@@ -50,10 +50,6 @@ test_that("Module runs with defaults", {
   expect_true(!is.null(simTest$spinupSQL))
   expect_true(inherits(simTest$spinupSQL, "data.table"))
 
-  # pooldef
-  expect_true(!is.null(simTest$pooldef))
-  expect_true(inherits(simTest$pooldef, "character"))
-
 })
 
 
