@@ -20,9 +20,9 @@ defineModule(sim, list(
   inputObjects = bindrows(
     expectsInput(objectName = "dbPath", objectClass = "character",
                  desc = "Path to the CBM defaults databse",
-                 sourceURL = "https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_defaults_db/cbm_defaults_v1.2.8340.362.db"),
     expectsInput(objectName = "dbPathURL", objectClass = "character",
                  desc = "URL for dbPath"),
+                 sourceURL = "https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_defaults_db/cbm_defaults_v1.2.9300.391.db"),
     expectsInput(objectName = "dMatrixAssociation", objectClass = "data.frame",
                  desc = "Disturbance table matching different disturbance IDs",
                  sourceURL = "https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_association.csv"),
@@ -182,7 +182,7 @@ Init <- function(sim) {
 
     }else{
 
-      sim$dbPath <- file.path(inputPath(sim), "cbm_defaults_v1.2.8340.362.db")
+      sim$dbPath <- file.path(inputPath(sim), basename(extractURL("dbPath")))
 
       if (!file.exists(sim$dbPath)) prepInputs(
         destinationPath = inputPath(sim),
