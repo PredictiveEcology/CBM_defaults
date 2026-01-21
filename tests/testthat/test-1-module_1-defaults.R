@@ -34,6 +34,21 @@ test_that("Module runs with defaults", {
 
   ## Check outputs ----
 
+  # cbm_defaults_db
+  expect_true(file.exists(simTest$cbm_defaults_db))
+
+  outPathSpl <- strsplit(spadesTestPaths$outputPath, "(/|\\\\)")[[1]]
+  expect_identical(outPathSpl[(length(outPathSpl)-2):length(outPathSpl)],
+                   strsplit(simTest$cbm_defaults_db, "(/|\\\\)")[[1]][(length(outPathSpl)-2):length(outPathSpl)])
+
+  # cbm_exn_dir
+  expect_true(file.exists(simTest$cbm_exn_dir))
+  expect_true(length(list.files(simTest$cbm_exn_dir)) > 0)
+
+  outPathSpl <- strsplit(spadesTestPaths$outputPath, "(/|\\\\)")[[1]]
+  expect_identical(outPathSpl[(length(outPathSpl)-2):length(outPathSpl)],
+                   strsplit(simTest$cbm_exn_dir, "(/|\\\\)")[[1]][(length(outPathSpl)-2):length(outPathSpl)])
+
   # CBMspecies
   expect_true(!is.null(simTest$CBMspecies))
   expect_true(inherits(simTest$CBMspecies, "data.table"))

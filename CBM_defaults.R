@@ -15,26 +15,20 @@ defineModule(sim, list(
   documentation = list("README.txt", "CBM_defaults.Rmd"),
   reqdPkgs = list("reproducible", "data.table", "DBI", "RSQLite"),
   parameters = bindrows(
+    defineParameter("cbm_defaults_db_version", "character", "1.2.9300.391", NA, NA,
+                    desc = "DBM defaults SQLite database version"),
     defineParameter(".useCache", "logical", FALSE, NA, NA, NA)
   ),
   inputObjects = bindrows(
-    expectsInput(objectName = "dbPath", objectClass = "character",
-                 desc = "Path to the CBM defaults databse",
-    expectsInput(objectName = "dbPathURL", objectClass = "character",
-                 desc = "URL for dbPath"),
-                 sourceURL = "https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_defaults_db/cbm_defaults_v1.2.9300.391.db"),
-    expectsInput(objectName = "dMatrixAssociation", objectClass = "data.frame",
-                 desc = "Disturbance table matching different disturbance IDs",
-                 sourceURL = "https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_association.csv"),
-    expectsInput( objectName = "dMatrixAssociationURL", objectClass = "character",
-      desc = "URL for dMatrixAssociation"),
-    expectsInput(objectName = "dMatrixValue", objectClass = "data.frame",
-                 desc = "Carbon transfer values table with associated disturbance IDs",
-                 sourceURL = "https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_value.csv"),
-    expectsInput( objectName = "dMatrixValueURL", objectClass = "character",
-                  desc = "URL for dMatrixValue")
+    expectsInput(
+      objectName = "libcbm_resources", objectClass = "character", desc = "Path to libcbm resources directory",
+      sourceURL = "https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources")
   ),
   outputObjects = bindrows(
+    createsOutput(objectName = "cbm_defaults_db", objectClass = "character",
+                  desc = "Path to CBM defaults SQLite database in the project outputs directory"),
+    createsOutput(objectName = "cbm_exn_dir",     objectClass = "character",
+                  desc = "Path to CBM-EXN parameters directory in the project outputs directory"),
     createsOutput(objectName = "CBMspecies",        objectClass = "data.table",
                   desc = "Species table with names and associated species id"),
     createsOutput(objectName = "disturbanceMatrix", objectClass = "data.table",
@@ -61,10 +55,31 @@ doEvent.CBM_defaults <- function(sim, eventTime, eventType, debug = FALSE) {
 
 Init <- function(sim) {
 
-  ## Read the CBM-CFS3 Database ----
+  # Copy CBM resources to outputs directory
+  resPath <- file.path(outputPath(sim), "CBM_defaults", "resources")
+  if (file.exists(resPath)) unlink(resPath, recursive = TRUE)
+  if (file.exists(resPath)) stop("Could not remove CBM_defaults resources directory: ", resPath)
+
+  if (is.null(sim$cbm_defaults_db)){
+
+    dbPath <- paste0("cbm_defaults_db/cbm_defaults_v", P(sim)$cbm_defaults_db_version, ".db")
+
+    sim$cbm_defaults_db <- file.path(resPath, dbPath)
+    dir.create(dirname(sim$cbm_defaults_db), recursive = TRUE, showWarnings = FALSE)
+    file.copy(file.path(sim$libcbm_resources, dbPath), sim$cbm_defaults_db)
+  }
+
+  if (is.null(sim$cbm_exn_dir)){
+
+    exnPath <- "cbm_exn"
+
+    sim$cbm_exn_dir <- file.path(resPath, exnPath)
+    dir.create(dirname(sim$cbm_exn_dir), recursive = TRUE, showWarnings = FALSE)
+    file.copy(file.path(sim$libcbm_resources, exnPath), dirname(sim$cbm_exn_dir), recursive = TRUE)
+  }
 
   # Connect to database
-  archiveIndex <- dbConnect(dbDriver("SQLite"), sim$dbPath)
+  archiveIndex <- dbConnect(dbDriver("SQLite"), sim$cbm_defaults_db)
   on.exit(dbDisconnect(archiveIndex))
 
   # dbListTables(archiveIndex)
@@ -107,15 +122,18 @@ Init <- function(sim) {
   matrices6 <- matrices6[locale_id <= 1,]
   # only keep the colums we need, disturbance_type_id and its associated name.
   matrices6 <- matrices6[,.(disturbance_type_id, name, description)]
+
   # $disturbanceMatrix links together spatial_unit_id disturbance_type_id
   # disturbance_matrix_id, the disturbance names and descriptions.
-  disturbanceMatrix <- sim$dMatrixAssociation[matrices6, on = .(disturbance_type_id = disturbance_type_id), allow.cartesian = TRUE]
+  dMatrixAssociation <- data.table::fread(file.path(sim$cbm_exn_dir, "disturbance_matrix_association.csv"))
+  disturbanceMatrix <- dMatrixAssociation[matrices6, on = .(disturbance_type_id = disturbance_type_id), allow.cartesian = TRUE]
   sim$disturbanceMatrix <- disturbanceMatrix
 
   # here we want to match sim$dMatrixValue with disturbanceMatrix so that sim$CTransfers has disturbance names.
   # CTransfers will have to be subset to the regions' spatial_unit_id.
+  dMatrixValue <- data.table::fread(file.path(sim$cbm_exn_dir, "disturbance_matrix_value.csv"))
   disturbanceNames <- unique(disturbanceMatrix[, .(disturbance_type_id, spatial_unit_id, sw_hw, disturbance_matrix_id, name, description)])
-  cTransfers <- sim$dMatrixValue[disturbanceNames, on = .(disturbance_matrix_id = disturbance_matrix_id), allow.cartesian=TRUE]
+  cTransfers <- dMatrixValue[disturbanceNames, on = .(disturbance_matrix_id = disturbance_matrix_id), allow.cartesian=TRUE]
   sim$cTransfers <- cTransfers
 
   # Get location and mean_annual_temperature for each spatial_unit, along with
@@ -128,11 +146,7 @@ Init <- function(sim) {
   sim$spinupSQL <- spatialUnitIds[spinupParameter, on = .(spinup_parameter_id = id)]
 
   #extract species.csv
-  CBMspeciesURL <- "https://raw.githubusercontent.com/cat-cfs/libcbm_py/refs/heads/main/libcbm/resources/cbm_exn/species.csv"
-  sim$CBMspecies <- prepInputs(url = CBMspeciesURL,
-                           targetFile = "species.csv",
-                           destinationPath = inputPath(sim),
-                           fun = fread)
+  sim$CBMspecies <- data.table::fread(file.path(sim$cbm_exn_dir, "species.csv"))
 
   #build cbmAdmin
   spatialUnit <- as.data.table(dbGetQuery(archiveIndex, "SELECT * FROM spatial_unit"))
@@ -171,51 +185,35 @@ Init <- function(sim) {
 
 .inputObjects <- function(sim) {
 
-  # CBM-CFS3 Database
-  if (!suppliedElsewhere("dbPath", sim)){
-    if (suppliedElsewhere("dbPathURL", sim)){
+  if (!suppliedElsewhere("libcbm_resources", sim)){
 
-      sim$dbPath <- prepInputs(
-        destinationPath = inputPath(sim),
-        url = sim$dbPathURL
-      )
+    sim$libcbm_resources <- file.path(inputPath(sim), "libcbm_resources")
 
-    }else{
+    dlFiles <- c(
+      paste0("cbm_defaults_db/cbm_defaults_v", P(sim)$cbm_defaults_db_version, ".db"),
+      "cbm_exn/decay_parameters.csv",
+      "cbm_exn/disturbance_matrix_association.csv",
+      "cbm_exn/disturbance_matrix_value.csv",
+      "cbm_exn/root_parameters.csv",
+      "cbm_exn/slow_mixing_rate.csv",
+      "cbm_exn/species.csv",
+      "cbm_exn/turnover_parameters.csv",
+      "cbm_exn/flux.json",
+      "cbm_exn/pools.json"
+    )
 
-      sim$dbPath <- file.path(inputPath(sim), basename(extractURL("dbPath")))
-
-      if (!file.exists(sim$dbPath)) prepInputs(
-        destinationPath = inputPath(sim),
-        url         = extractURL("dbPath"),
-        targetFile  = basename(sim$dbPath),
-        dlFun       = download.file(extractURL("dbPath"), sim$dbPath, mode = "wb", quiet = TRUE),
+    for (dlFile in dlFiles){
+      dlURL  <- file.path(extractURL("libcbm_resources"), dlFile)
+      dlPath <- file.path(sim$libcbm_resources, dlFile)
+      dir.create(dirname(dlPath), recursive = TRUE, showWarnings = FALSE)
+      prepInputs(
+        destinationPath = dirname(dlPath),
+        url         = dlURL,
+        targetFile  = basename(dlPath),
+        dlFun       = download.file(dlURL, dlPath, mode = "wb", quiet = TRUE),
         fun         = NA
       )
     }
-  }
-
-  # Disturbance Matrix Association
-  if (!suppliedElsewhere("dMatrixAssociation", sim)) {
-    if (!suppliedElsewhere("dMatrixAssociationURL", sim)) {
-      sim$dMatrixAssociationURL <- extractURL("dMatrixAssociation")
-    }
-    sim$dMatrixAssociation <- prepInputs(url = sim$dMatrixAssociationURL,
-                               targetFile = "disturbance_matrix_association.csv",
-                               destinationPath = inputPath(sim),
-                               fun = fread
-                               )
-  }
-
-  #Disturbance Matrix Value
-  if (!suppliedElsewhere("dMatrixValue", sim)) {
-    if (!suppliedElsewhere("dMatrixValueURL", sim)) {
-      sim$dMatrixValueURL <- extractURL("dMatrixValue")
-    }
-    sim$dMatrixValue <- prepInputs(url = sim$dMatrixValueURL,
-                                         targetFile = "disturbance_matrix_value.csv",
-                                         destinationPath = inputPath(sim),
-                                         fun = fread
-    )
   }
 
   # Return sim
