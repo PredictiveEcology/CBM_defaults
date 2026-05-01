@@ -32,8 +32,6 @@ https://github.com/cat-cfs/libcbm_py/tree/main/libcbm/resources/cbm_exn
 | Disturbance Matrix Association | Data table | Default disturbance IDs | [GitHub](https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_association.csv) |
 | Disturbance Matrix Value | Data table | Default disturbance data | [GitHub](https://raw.githubusercontent.com/cat-cfs/libcbm_py/main/libcbm/resources/cbm_exn/disturbance_matrix_value.csv) |
 | species.csv | Data table | Default species information | [GitHub](https://github.com/cat-cfs/libcbm_py/blob/main/libcbm/resources/cbm_exn/species.csv) |
-| ecoLocator | Shapefile | Canada's ecozone as polygon features | [Canadian Soil information Service](http://sis.agr.gc.ca/cansis/nsdb/ecostrat/zone/ecozone_shp.zip) |
-| spuLocator | Shapefile | Canada's spatial units as polygon features | [Google Drive](https://drive.google.com/file/d/1D3O0Uj-s_QEgMW7_X-NhVsEZdJ29FBed) |
 
 
 ## Module functioning
