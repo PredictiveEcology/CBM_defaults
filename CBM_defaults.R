@@ -141,7 +141,7 @@ Init <- function(sim) {
   sim$CBMspecies <- prepInputs(url = CBMspeciesURL,
                            targetFile = "species.csv",
                            destinationPath = inputPath(sim),
-                           fun = fread)
+                           fun = data.table::fread)
 
   #build cbmAdmin
   spatialUnit <- as.data.table(dbGetQuery(archiveIndex, "SELECT * FROM spatial_unit"))
@@ -211,8 +211,7 @@ Init <- function(sim) {
     sim$dMatrixAssociation <- prepInputs(url = sim$dMatrixAssociationURL,
                                targetFile = "disturbance_matrix_association.csv",
                                destinationPath = inputPath(sim),
-                               fun = fread
-                               )
+                               fun = data.table::fread)
   }
 
   #Disturbance Matrix Value
@@ -223,8 +222,7 @@ Init <- function(sim) {
     sim$dMatrixValue <- prepInputs(url = sim$dMatrixValueURL,
                                          targetFile = "disturbance_matrix_value.csv",
                                          destinationPath = inputPath(sim),
-                                         fun = fread
-    )
+                                         fun = data.table::fread)
   }
 
   # Return sim
