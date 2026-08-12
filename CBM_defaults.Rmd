@@ -40,7 +40,6 @@ https://github.com/cat-cfs/libcbm_py/tree/main/libcbm/resources/cbm_exn
 - Parameters necessary for [spadesCBM](https://github.com/PredictiveEcology/spadesCBM.git) simulations are extracted from the downloaded files. Each of these are saved as objects in the [simList](https://predictiveecology.github.io/spadesCBM/lexicon.html) (see list of output objects above).
 - The `disturbanceMatrix` and `cTransfers` objects help identify which carbon transfers matches the provided disturbances as it matches the transfer matrix IDs and the proportions transferred to disturbance names.
 - Parameters necessary for the `spinup` event in the [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) modules are assembled in the `spinupSQL` object.
-- `pooldef` gives the names of each [carbon pool](https://predictiveecology.github.io/spadesCBM/index.html#pools) that exists in CBM.
 - [`species.csv`](https://github.com/cat-cfs/libcbm_py/blob/main/libcbm/resources/cbm_exn/species.csv) is read in as the `CBMspecies` object. 
 - `cbmAdmin` identifies all ecozones and spatial unit IDs combinations possible for each province and territory.
 
@@ -48,11 +47,11 @@ https://github.com/cat-cfs/libcbm_py/tree/main/libcbm/resources/cbm_exn
 
 | Name              | Class      | Description                          |
 |-------------------|------------|--------------------------------------|
+| libcbm_resources  | Character  | Path to CBM defaults SQLite database in the project outputs directory            |
+| cbm_exn_dir       | Character  | Path to CBM-EXN parameters directory in the project outputs directory             |
 | disturbanceMatrix | Data table | Default disturbance data             |
 | cTransfers        | Data table | Default disturbance data             |
 | spinupSQL         | Data table | Parameters for [CBM_core](https://github.com/PredictiveEcology/CBM_core.git) spinup event |
-| pooldef           | Character  | Vector of pools                      |
-| CBMspecies        | Data table | Default species data             |
 | cbmAdmin          | Data table | Ecozone and spatial unit information for provincial boundaries |	
 
 
