@@ -41,6 +41,10 @@ jobs:
 
       - name: Run tests
         run: |
-          testthat::test_dir("tests/testthat", filter = "integration", invert = TRUE, stop_on_failure = TRUE)
+          if (Sys.getenv("GOOGLE_AUTH") != ""){
+            Require::Require("googledrive")
+            googledrive::drive_auth(path = Sys.getenv("GOOGLE_AUTH"))
+          }
+          testthat::test_dir("tests/testthat", stop_on_failure = TRUE)
         shell: Rscript {0}
 
