@@ -10,7 +10,7 @@ on:
 jobs:
   testthat-module:
     #uses: PredictiveEcology/actions/.github/workflows/testthat-module.yaml@main
-    uses: suz-estella/PredictiveEcology-actions/.github/workflows/testthat-module.yaml@main
+    uses: suz-estella/PredictiveEcology-actions/.github/workflows/testthat-module.yaml@suz-updates
     with:
       module: CBM_defaults
       extra-config: >-
