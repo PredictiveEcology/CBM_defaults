@@ -13,6 +13,7 @@ defineModule(sim, list(
   timeunit = "year",
   citation = list("citation.bib"),
   documentation = list("README.txt", "CBM_defaults.Rmd"),
+  loadOrder = list(before = c("CBM_dataPrep", "CBM_vol2biomass", "CBM_core")),
   reqdPkgs = list("reproducible", "data.table", "DBI", "RSQLite"),
   parameters = bindrows(
     defineParameter("cbm_defaults_db_version", "character", "1.2.9300.391", NA, NA,
